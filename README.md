@@ -4,6 +4,10 @@ A tiny macOS menu-bar internet speed checker. No windows, no Dock icon — just 
 speedometer in the menu bar that runs Apple's built-in `networkQuality` tool and
 animates the result.
 
+<p align="center">
+  <img src="docs/demo.gif" alt="LeanSpeedo running a speed test" width="320">
+</p>
+
 - **Download / Upload** capacity (Mbps)
 - **Responsiveness** (RPM — round-trips per minute, higher is better)
 - Live bars that fill during the test, driven by `networkQuality`'s streaming output
