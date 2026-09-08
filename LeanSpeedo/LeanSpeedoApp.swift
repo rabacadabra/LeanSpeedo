@@ -244,10 +244,9 @@ private struct SpeedPanel: View {
             metrics
 
             switch checker.state {
-            case .idle:
-                actionButton(title: "Test")
-
-            case .running:
+            case .idle, .running:
+                // Opening the panel starts a test immediately, so `.idle` is
+                // only ever on screen for a frame before `.running`.
                 HStack(spacing: 8) {
                     ProgressView()
                         .controlSize(.small)
