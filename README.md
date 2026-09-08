@@ -59,32 +59,10 @@ animated bars. The final `==== SUMMARY ====` block provides the authoritative
 numbers. The app is **not sandboxed** (it has to spawn a subprocess), which is
 also why it can't ship on the Mac App Store.
 
-## Build from source
+## Contributing
 
-```bash
-open LeanSpeedo.xcodeproj   # and run, or:
-brew install create-dmg
-./scripts/build-dmg.sh      # -> build/LeanSpeedo.dmg
-```
-
-The app icon is generated from vector art:
-
-```bash
-swift scripts/make-icon.swift LeanSpeedo/Assets.xcassets/AppIcon.appiconset
-```
-
-## Releasing
-
-Tag a version and push — [`.github/workflows/release.yml`](.github/workflows/release.yml)
-builds the DMG and attaches it to a GitHub Release:
-
-```bash
-git tag v1.0.0
-git push origin v1.0.0
-```
-
-Then update the Homebrew cask (in the separate `homebrew-tap` repo) with the new
-`version` and the `sha256` printed by the workflow.
+Building from source and the release process are documented in
+[CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
