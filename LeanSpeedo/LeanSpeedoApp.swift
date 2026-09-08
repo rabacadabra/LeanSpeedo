@@ -17,6 +17,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     private var statusItem: NSStatusItem!
     private let popover = NSPopover()
     private var cancellables: Set<AnyCancellable> = []
+    private var pendingReset: Task<Void, Never>?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         let host = NSHostingController(rootView: SpeedPanel(checker: checker))
@@ -89,10 +90,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
 
     private func showPopover() {
         guard let button = statusItem.button else { return }
+        pendingReset?.cancel()
+        pendingReset = nil
         popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
-        // Don't let the popover take keyboard focus — otherwise Space/Return
-        // would trigger whichever button is first responder (e.g. Quit).
-        popover.contentViewController?.view.window?.makeFirstResponder(nil)
+
+        // Make the panel's window key so its controls render active (not grayed)
+        // even when it re-opens itself after a test. Nothing inside is focusable
+        // (see SpeedPanel), so this doesn't route the keyboard to any button.
+        if let window = popover.contentViewController?.view.window {
+            window.makeKeyAndOrderFront(nil)
+            window.makeFirstResponder(nil)
+        }
 
         // Kick off a test as soon as the panel opens fresh.
         if case .idle = checker.state {
@@ -101,7 +109,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     }
 
     func popoverDidClose(_ notification: Notification) {
-        checker.reset()
+        // Keep results around briefly so a quick re-open still shows them.
+        pendingReset?.cancel()
+        pendingReset = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(3))
+            guard !Task.isCancelled else { return }
+            self?.checker.reset()
+        }
     }
 }
 
@@ -230,6 +244,7 @@ private struct SpeedPanel: View {
         }
         .controlSize(.small)
         .buttonStyle(.borderedProminent)
+        .focusable(false)
         .frame(maxWidth: .infinity, alignment: .center)
     }
 }
