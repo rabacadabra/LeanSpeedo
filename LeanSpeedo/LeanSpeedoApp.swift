@@ -2,6 +2,7 @@ import SwiftUI
 import AppKit
 import Combine
 import ServiceManagement
+import Carbon.HIToolbox
 
 @main
 struct LeanSpeedoApp: App {
@@ -21,6 +22,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     private var pendingReset: Task<Void, Never>?
     private var logWindow: NSWindow?
     private var isPulsing = false
+    private var hotKeyRef: EventHotKeyRef?
+    private var hotKeyHandler: EventHandlerRef?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         let panel = SpeedPanel(checker: checker) { [weak self] detail in
@@ -47,6 +50,38 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
                 MainActor.assumeIsolated { self?.handle(state: state) }
             }
             .store(in: &cancellables)
+
+        registerHotKey()
+    }
+
+    // MARK: - Global hotkey (⌃⌥⌘R)
+
+    private func registerHotKey() {
+        var spec = EventTypeSpec(eventClass: OSType(kEventClassKeyboard),
+                                 eventKind: OSType(kEventHotKeyPressed))
+        InstallEventHandler(
+            GetApplicationEventTarget(),
+            { _, _, userData in
+                if let userData {
+                    let delegate = Unmanaged<AppDelegate>.fromOpaque(userData).takeUnretainedValue()
+                    MainActor.assumeIsolated { delegate.triggerTest() }
+                }
+                return noErr
+            },
+            1, &spec,
+            Unmanaged.passUnretained(self).toOpaque(),
+            &hotKeyHandler
+        )
+
+        let modifiers = UInt32(controlKey | optionKey | cmdKey)
+        let id = EventHotKeyID(signature: 0x4C535044 /* 'LSPD' */, id: 1)
+        RegisterEventHotKey(UInt32(kVK_ANSI_R), modifiers, id,
+                            GetApplicationEventTarget(), 0, &hotKeyRef)
+    }
+
+    deinit {
+        if let hotKeyRef { UnregisterEventHotKey(hotKeyRef) }
+        if let hotKeyHandler { RemoveEventHandler(hotKeyHandler) }
     }
 
     // MARK: - State handling
@@ -125,7 +160,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         menu.autoenablesItems = false
 
         let test = NSMenuItem(title: checker.isRunning ? "Revving…" : "Run Speed Test",
-                              action: #selector(menuRunTest), keyEquivalent: "")
+                              action: #selector(menuRunTest), keyEquivalent: "r")
+        test.keyEquivalentModifierMask = [.control, .option, .command]
         test.target = self
         test.isEnabled = !checker.isRunning
         menu.addItem(test)
@@ -144,6 +180,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     }
 
     @objc private func menuRunTest() {
+        triggerTest()
+    }
+
+    private func triggerTest() {
         checker.run()
         if !popover.isShown { showPopover() }
     }

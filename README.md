@@ -9,6 +9,7 @@ animates the result.
 - Live bars that fill during the test, driven by `networkQuality`'s streaming output
 - Starts a test automatically when you open the panel; re-opens itself when a
   test finishes while closed
+- Global shortcut **⌃⌥⌘R** runs a test from anywhere
 - Right-click the menu bar icon for a quick menu (test, launch at login, quit)
 - Last result shown as a tooltip on the menu bar icon
 - Clear errors when a test fails, with the full log one click away
