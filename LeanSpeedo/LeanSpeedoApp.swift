@@ -275,19 +275,6 @@ private struct SpeedPanel: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 actionButton(title: "Retest")
             }
-
-            Divider()
-
-            HStack {
-                Spacer()
-                Button("Quit") {
-                    NSApplication.shared.terminate(nil)
-                }
-                .buttonStyle(.plain)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .focusable(false)
-            }
         }
         .padding(14)
         .frame(width: 240)
