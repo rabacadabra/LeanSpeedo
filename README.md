@@ -15,21 +15,27 @@ animates the result.
 ### Homebrew (recommended)
 
 ```bash
-brew install --cask --no-quarantine rabacadabra/tap/leanspeedo
+brew install --cask rabacadabra/tap/leanspeedo
 ```
 
-`--no-quarantine` is needed because the app is ad-hoc signed, not notarized
-(see below).
+The app is ad-hoc signed, not notarized (notarization needs a paid Apple
+Developer account). The cask clears the download quarantine flag on install, so
+it launches normally.
 
 ### Manual
 
 Download `LeanSpeedo.dmg` from the [latest release](https://github.com/rabacadabra/LeanSpeedo/releases/latest),
 open it, and drag **LeanSpeedo** to Applications.
 
-On first launch macOS will say it "cannot verify the developer". Open
-**System Settings → Privacy & Security**, scroll down, and click **Open Anyway**.
-This is a one-time step — the app is ad-hoc signed but not notarized (that
-requires a paid Apple Developer account).
+On first launch macOS will say it "cannot verify the developer". Either open
+**System Settings → Privacy & Security**, scroll down, and click **Open Anyway**,
+or run:
+
+```bash
+xattr -dr com.apple.quarantine /Applications/LeanSpeedo.app
+```
+
+This is a one-time step.
 
 ## Requirements
 
