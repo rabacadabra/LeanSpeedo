@@ -68,7 +68,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         case .idle:
             statusItem.button?.toolTip = "LeanSpeedo"
         case .running:
-            statusItem.button?.toolTip = "Testing…"
+            statusItem.button?.toolTip = "Revving…"
         case .result(let s):
             statusItem.button?.toolTip = "↓ \(s.download)   ↑ \(s.upload)   \(s.responsiveness)"
         case .failure(let f):
@@ -124,7 +124,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         let menu = NSMenu()
         menu.autoenablesItems = false
 
-        let test = NSMenuItem(title: checker.isRunning ? "Testing…" : "Run Speed Test",
+        let test = NSMenuItem(title: checker.isRunning ? "Revving…" : "Run Speed Test",
                               action: #selector(menuRunTest), keyEquivalent: "")
         test.target = self
         test.isEnabled = !checker.isRunning
@@ -250,7 +250,7 @@ private struct SpeedPanel: View {
                 HStack(spacing: 8) {
                     ProgressView()
                         .controlSize(.small)
-                    Text("Testing…")
+                    Text("Revving…")
                         .foregroundStyle(.secondary)
                 }
                 .font(.callout)
@@ -258,7 +258,7 @@ private struct SpeedPanel: View {
                 .padding(.top, 2)
 
             case .result:
-                actionButton(title: "Retest")
+                actionButton(title: "Revv again")
 
             case .failure(let failure):
                 VStack(alignment: .leading, spacing: 6) {
@@ -272,7 +272,7 @@ private struct SpeedPanel: View {
                         .focusable(false)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                actionButton(title: "Retest")
+                actionButton(title: "Revv again")
             }
         }
         .padding(14)
